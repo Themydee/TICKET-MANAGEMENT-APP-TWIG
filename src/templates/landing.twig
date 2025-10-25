@@ -1,0 +1,97 @@
+{% extends "layout.twig" %}
+
+{% block title %}TicketFlow - Manage Your Tickets Effortlessly{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header class="header">
+    <div class="container header-content">
+        <div class="logo">TicketFlow</div>
+        <nav class="nav-links">
+            <a href="/index.php?page=login" class="btn btn-secondary">Login</a>
+            <a href="/index.php?page=signup" class="btn btn-primary">Get Started</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="circle-decoration circle-1"></div>
+
+    <div class="container hero-content">
+        <h1>Manage Your Tickets Effortlessly</h1>
+        <p>
+            Track, organize, and resolve support tickets with ease.
+            Built for teams that value efficiency and simplicity.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="/index.php?page=signup" class="btn btn-primary">Get Started Free</a>
+            <a href="/index.php?page=login" class="btn btn-secondary">Login</a>
+        </div>
+    </div>
+
+    <div class="hero-wave">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path
+                d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+                fill="#ffffff"
+            />
+        </svg>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="circle-decoration circle-2"></div>
+    <div class="circle-decoration circle-3"></div>
+
+    <div class="container">
+        <h2>Why Choose TicketFlow?</h2>
+
+        <div class="feature-grid">
+            <div class="feature-box">
+                <h3>✨ Easy to Use</h3>
+                <p>
+                    Intuitive interface designed for quick ticket creation and management.
+                    No learning curve required - start managing tickets immediately.
+                </p>
+            </div>
+
+            <div class="feature-box">
+                <h3>⚡ Real-time Updates</h3>
+                <p>
+                    Track ticket status changes instantly. Stay informed with live
+                    notifications and seamless updates across your team.
+                </p>
+            </div>
+
+            <div class="feature-box">
+                <h3>🔒 Secure & Reliable</h3>
+                <p>
+                    Your data is protected with industry-standard security measures.
+                    Role-based access control keeps your information safe.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 TicketFlow. All rights reserved.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.875rem; opacity: 0.8">
+            Built with Twig | Manage tickets with ease
+        </p>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    checkAuth(); // ✅ Runs safely after /js/app.js is loaded
+});
+</script>
+{% endblock %}

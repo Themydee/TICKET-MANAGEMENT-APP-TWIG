@@ -1,0 +1,14 @@
+{
+    "name": "ticketflow/twig-app",
+    "description": "A modern ticket management web application built with Twig",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "twig/twig": "^3.21"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

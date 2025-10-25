@@ -1,0 +1,123 @@
+{% extends "layout.twig" %}
+
+{% block title %}{{ isLogin ? 'Login' : 'Sign Up' }} - TicketFlow{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h2 id="auth-title">{{ isLogin ? 'Welcome Back' : 'Create Account' }}</h2>
+
+        <form id="auth-form">
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required />
+                <div id="email-error" class="error-message hidden"></div>
+            </div>
+
+            <!-- Username (Signup only) -->
+            <div class="form-group" id="username-group" style="display: {{ isLogin ? 'none' : 'block' }}">
+                <label for="username">Username</label>
+                <input type="text" id="username" />
+                <div id="username-error" class="error-message hidden"></div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required />
+                <div id="password-error" class="error-message hidden"></div>
+            </div>
+
+            <!-- Confirm Password (Signup only) -->
+            <div class="form-group" id="confirm-password-group" style="display: {{ isLogin ? 'none' : 'block' }}">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" />
+                <div id="confirmPassword-error" class="error-message hidden"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem">
+                <span id="submit-text">{{ isLogin ? 'Login' : 'Sign Up' }}</span>
+            </button>
+        </form>
+
+        <div class="auth-toggle">
+            <p>
+                {{ isLogin ? "Don't have an account?" : "Already have an account?" }}
+                <button type="button" id="toggle-mode">
+                    <span id="toggle-link-text">{{ isLogin ? 'Sign Up' : 'Login' }}</span>
+                </button>
+            </p>
+        </div>
+
+        <div id="demo-info" style="margin-top: 1.5rem; background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; font-size: 0.875rem; color: #6b7280; display: {{ isLogin ? 'block' : 'none' }}">
+            <strong>Demo:</strong> Create an account or use test credentials.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // ✅ Safe to call now — JS files from layout are already loaded
+  checkAuth();
+
+  let isLogin = {{ isLogin ? 'true' : 'false' }};
+
+  const toggleMode = document.getElementById('toggle-mode');
+  const form = document.getElementById('auth-form');
+
+  toggleMode.addEventListener('click', () => {
+    isLogin = !isLogin;
+    const newUrl = isLogin ? '/index.php?page=login' : '/index.php?page=signup';
+    window.history.pushState({}, '', newUrl);
+    document.getElementById('auth-title').textContent = isLogin ? 'Welcome Back' : 'Create Account';
+    document.getElementById('submit-text').textContent = isLogin ? 'Login' : 'Sign Up';
+    document.getElementById('toggle-link-text').textContent = isLogin ? 'Sign Up' : 'Login';
+    document.getElementById('username-group').style.display = isLogin ? 'none' : 'block';
+    document.getElementById('confirm-password-group').style.display = isLogin ? 'none' : 'block';
+    document.getElementById('demo-info').style.display = isLogin ? 'block' : 'none';
+    form.reset();
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = {
+      email: email.value,
+      username: username.value,
+      password: password.value,
+      confirmPassword: confirmPassword.value,
+    };
+
+    const errors = isLogin ? validateLoginForm(formData) : validateSignupForm(formData);
+    if (Object.keys(errors).length > 0) {
+      for (const field in errors) {
+        const el = document.getElementById(field + '-error');
+        if (el) {
+          el.textContent = errors[field];
+          el.classList.remove('hidden');
+        }
+      }
+      return;
+    }
+
+    if (isLogin) {
+      const result = login(formData.email, formData.password);
+      if (result.success) {
+        showToast('Login successful!', 'success');
+        setTimeout(() => window.location.href = '/index.php?page=dashboard', 1000);
+      } else {
+        showToast(result.error, 'error');
+      }
+    } else {
+      const result = signup(formData.email, formData.username, formData.password);
+      if (result.success) {
+        showToast('Account created successfully!', 'success');
+        setTimeout(() => window.location.href = '/index.php?page=dashboard', 1000);
+      } else {
+        showToast(result.error, 'error');
+      }
+    }
+  });
+</script>
+{% endblock %}
