@@ -8,9 +8,8 @@
     <div class="container header-content">
         <div class="logo">TicketFlow</div>
         <nav class="nav-links">
-            <!-- ✅ FIXED: Changed from /index.php?page= to ?page= -->
-            <a href="?page=login" class="btn btn-secondary">Login</a>
-            <a href="?page=signup" class="btn btn-primary">Get Started</a>
+            <a href="/index.php?page=login" class="btn btn-secondary">Login</a>
+            <a href="/index.php?page=signup" class="btn btn-primary">Get Started</a>
         </nav>
     </div>
 </header>
@@ -27,9 +26,8 @@
         </p>
 
         <div class="hero-buttons">
-            <!-- ✅ FIXED: Changed both hero buttons -->
-            <a href="?page=signup" class="btn btn-primary">Get Started Free</a>
-            <a href="?page=login" class="btn btn-secondary">Login</a>
+            <a href="/index.php?page=signup" class="btn btn-primary">Get Started Free</a>
+            <a href="/index.php?page=login" class="btn btn-secondary">Login</a>
         </div>
     </div>
 
@@ -88,9 +86,12 @@
         </p>
     </div>
 </footer>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-    // Check if already logged in, redirect to dashboard
-    checkAuth();
+document.addEventListener("DOMContentLoaded", () => {
+    checkAuth(); // ✅ Runs safely after /js/app.js is loaded
+});
 </script>
 {% endblock %}

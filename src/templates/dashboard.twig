@@ -32,8 +32,7 @@
       <!-- Dashboard header -->
       <div class="dashboard-header">
         <h1>Dashboard</h1>
-        <!-- ✅ FIXED: Changed from /index.php?page=tickets to ?page=tickets -->
-        <a href="?page=tickets" class="btn btn-primary">
+        <a href="/index.php?page=tickets" class="btn btn-primary">
           Manage Tickets
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -73,9 +72,8 @@
         </p>
 
         <div style="display: flex; gap: 1rem; flex-wrap: wrap">
-          <!-- ✅ FIXED: Changed both links -->
-          <a href="?page=tickets" class="btn btn-primary">View All Tickets</a>
-          <a href="?page=tickets" class="btn btn-secondary">Create New Ticket</a>
+          <a href="/index.php?page=tickets" class="btn btn-primary">View All Tickets</a>
+          <a href="/index.php?page=tickets" class="btn btn-secondary">Create New Ticket</a>
         </div>
       </div>
 
@@ -102,27 +100,47 @@
     </div>
   </footer>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-// ✅ Protect page - redirect if not authenticated
-protectPage();
+document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Redirect if not logged in
+  protectPage();
 
-// ✅ Load user info
-const user = getCurrentUser();
-if (user) {
-  document.getElementById('username').textContent = user.username;
-}
+  // ✅ Show logged-in user
+  const user = getCurrentUser();
+  if (user) {
+    document.getElementById("username").textContent = user.username || user.email;
+  }
 
-// ✅ Load statistics
-const stats = getTicketStats();
-document.getElementById('total-tickets').textContent = stats.total;
-document.getElementById('open-tickets').textContent = stats.open;
-document.getElementById('inprogress-tickets').textContent = stats.inProgress;
-document.getElementById('closed-tickets').textContent = stats.closed;
+  // ✅ Initialize sample tickets if none exist
+  initializeSampleTickets();
 
-// ✅ Show welcome message if no tickets
-if (stats.total === 0) {
-  document.getElementById('welcome-message').classList.remove('hidden');
-}
+  // ✅ Fetch tickets from localStorage
+  const tickets = JSON.parse(localStorage.getItem("ticketapp_tickets") || "[]");
+
+  // ✅ Compute statistics
+  const stats = {
+    total: tickets.length,
+    open: tickets.filter(t => t.status === "open").length,
+    inProgress: tickets.filter(t => t.status === "in_progress").length,
+    closed: tickets.filter(t => t.status === "closed").length
+  };
+
+  // ✅ Update dashboard stats
+  document.getElementById("total-tickets").textContent = stats.total;
+  document.getElementById("open-tickets").textContent = stats.open;
+  document.getElementById("inprogress-tickets").textContent = stats.inProgress;
+  document.getElementById("closed-tickets").textContent = stats.closed;
+
+  // ✅ Show welcome message if no tickets
+  const welcome = document.getElementById("welcome-message");
+  if (stats.total === 0) {
+    welcome.classList.remove("hidden");
+  } else {
+    welcome.classList.add("hidden");
+  }
+});
 </script>
 {% endblock %}
