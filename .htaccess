@@ -1,15 +1,8 @@
-# Redirect all requests to public directory
+# Redirect all requests to public folder
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
-    # Redirect to public folder if not already there
     RewriteCond %{REQUEST_URI} !^/public/
-    RewriteRule ^(.*)$ /public/$1 [L]
-    
-    # Handle front controller
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [L]
+    RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
 
 # Security headers
@@ -18,3 +11,12 @@
     Header set X-Frame-Options "SAMEORIGIN"
     Header set X-XSS-Protection "1; mode=block"
 </IfModule>
+
+# Prevent directory browsing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
