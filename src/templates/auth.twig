@@ -48,28 +48,22 @@
                     <span id="toggle-link-text">{{ isLogin ? 'Sign Up' : 'Login' }}</span>
                 </button>
             </p>
-        </div>
-
-        <div id="demo-info" style="margin-top: 1.5rem; background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; font-size: 0.875rem; color: #6b7280; display: {{ isLogin ? 'block' : 'none' }}">
-            <strong>Demo:</strong> Create an account or use test credentials.
-        </div>
+        </div
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  // ✅ Safe to call now — JS files from layout are already loaded
-  checkAuth();
-
   let isLogin = {{ isLogin ? 'true' : 'false' }};
-
   const toggleMode = document.getElementById('toggle-mode');
   const form = document.getElementById('auth-form');
 
+  // Remove checkAuth() since we'll handle auth server-side
+  
   toggleMode.addEventListener('click', () => {
     isLogin = !isLogin;
-    const newUrl = isLogin ? '/index.php?page=login' : '/index.php?page=signup';
+    const newUrl = `index.php?page=${isLogin ? 'login' : 'signup'}`;
     window.history.pushState({}, '', newUrl);
     document.getElementById('auth-title').textContent = isLogin ? 'Welcome Back' : 'Create Account';
     document.getElementById('submit-text').textContent = isLogin ? 'Login' : 'Sign Up';
@@ -78,10 +72,19 @@
     document.getElementById('confirm-password-group').style.display = isLogin ? 'none' : 'block';
     document.getElementById('demo-info').style.display = isLogin ? 'block' : 'none';
     form.reset();
+    
+    // Clear any existing error messages
+    const errorElements = document.querySelectorAll('.error-message');
+    errorElements.forEach(el => {
+      el.textContent = '';
+      el.classList.add('hidden');
+    });
   });
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    // Get form data
     const formData = {
       email: email.value,
       username: username.value,
@@ -89,6 +92,14 @@
       confirmPassword: confirmPassword.value,
     };
 
+    // Clear previous errors
+    const errorElements = document.querySelectorAll('.error-message');
+    errorElements.forEach(el => {
+      el.textContent = '';
+      el.classList.add('hidden');
+    });
+
+    // Validate form
     const errors = isLogin ? validateLoginForm(formData) : validateSignupForm(formData);
     if (Object.keys(errors).length > 0) {
       for (const field in errors) {
@@ -101,22 +112,34 @@
       return;
     }
 
-    if (isLogin) {
-      const result = login(formData.email, formData.password);
+    try {
+      // Send request to auth handler
+      const response = await fetch('auth_handler.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: isLogin ? 'login' : 'signup',
+          ...formData
+        })
+      });
+
+      const result = await response.json();
+      
       if (result.success) {
-        showToast('Login successful!', 'success');
-        setTimeout(() => window.location.href = '/index.php?page=dashboard', 1000);
+        localStorage.setItem('ticketapp_user', JSON.stringify({
+          email: formData.email,
+          username: formData.username || formData.email.split('@')[0]
+        }));
+        
+        showToast(isLogin ? 'Login successful!' : 'Account created successfully!', 'success');
+        window.location.href = 'index.php?page=dashboard';
       } else {
-        showToast(result.error, 'error');
+        showToast(result.error || 'Authentication failed', 'error');
       }
-    } else {
-      const result = signup(formData.email, formData.username, formData.password);
-      if (result.success) {
-        showToast('Account created successfully!', 'success');
-        setTimeout(() => window.location.href = '/index.php?page=dashboard', 1000);
-      } else {
-        showToast(result.error, 'error');
-      }
+    } catch (error) {
+      showToast('An error occurred. Please try again.', 'error');
     }
   });
 </script>

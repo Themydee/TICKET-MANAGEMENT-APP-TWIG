@@ -1,4 +1,7 @@
 <?php
+
+
+session_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Twig\Environment;
@@ -14,10 +17,32 @@ $twig = new Environment($loader, [
 // Get current page from URL
 $page = $_GET['page'] ?? 'landing';
 
+// Check if user is authenticated for protected routes
+$protected_routes = ['dashboard', 'tickets'];
+if (in_array($page, $protected_routes)) {
+    if (!isset($_SESSION['user'])) {
+        header('Location: index.php?page=login');
+        exit;
+    }
+}
+
+// Prevent accessing auth pages when already logged in
+$auth_routes = ['login', 'signup'];
+if (in_array($page, $auth_routes) && isset($_SESSION['user'])) {
+    header('Location: index.php?page=dashboard');
+    exit;
+}
+
+// Handle logout
+if ($page === 'logout') {
+    session_destroy();
+    header('Location: index.php?page=login');
+    exit;
+}
+
 // Render pages based on route
 switch ($page) {
     case 'landing':
-    case '':
         echo $twig->render('landing.twig');
         break;
 
@@ -30,15 +55,22 @@ switch ($page) {
         break;
 
     case 'dashboard':
-        echo $twig->render('dashboard.twig');
+        echo $twig->render('dashboard.twig', [
+            'user' => $_SESSION['user']
+        ]);
         break;
 
     case 'tickets':
-        echo $twig->render('tickets.twig');
+        $action = $_GET['action'] ?? 'list';
+        echo $twig->render('tickets.twig', [
+            'user' => $_SESSION['user'],
+            'action' => $action,
+            'currentPage' => 'tickets'
+        ]);
         break;
 
     default:
         http_response_code(404);
-        echo $twig->render('landing.twig');
+        echo $twig->render('error.twig', ['message' => 'Page not found']);
         break;
 }

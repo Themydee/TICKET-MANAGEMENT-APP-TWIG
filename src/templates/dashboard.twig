@@ -72,8 +72,8 @@
         </p>
 
         <div style="display: flex; gap: 1rem; flex-wrap: wrap">
-          <a href="/index.php?page=tickets" class="btn btn-primary">View All Tickets</a>
-          <a href="/index.php?page=tickets" class="btn btn-secondary">Create New Ticket</a>
+          <a href="index.php?page=tickets" class="btn btn-primary">View All Tickets</a>
+          <a href="index.php?page=tickets" class="btn btn-secondary">Create New Ticket</a>
         </div>
       </div>
 
@@ -105,8 +105,6 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // ✅ Redirect if not logged in
-  protectPage();
 
   // ✅ Show logged-in user
   const user = getCurrentUser();
